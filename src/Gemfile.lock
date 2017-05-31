@@ -199,6 +199,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages (~> 139)
+  jekyll-theme-cayman (~> 0.0.4)
   therubyracer (~> 0.12.2)
   tzinfo-data
 
