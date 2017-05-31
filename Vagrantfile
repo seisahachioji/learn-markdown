@@ -70,10 +70,13 @@ ORGSHELL
 
     diff = `git diff --name-only origin/master #{hash} --diff-filter=ACMR`.strip
 
+    filename = '提出ファイル.zip'
+    filename.encode!(Encoding::Windows_31J) if Gem.win_platform?
+
     if diff.length < 1
-      run 'rm "提出ファイル.zip"'
+      run "rm #{filename}"
     else
-      run "git archive #{hash} --format=zip #{diff} --output '提出ファイル.zip'"
+      run "git archive #{hash} --format=zip #{diff} --output #{filename}"
     end
 
   end
