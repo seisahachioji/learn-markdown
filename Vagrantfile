@@ -63,8 +63,8 @@ ORGSHELL
 
   config.trigger.after :halt do
     system 'git config --local --bool core.quotepath false'
-    system 'git add --intent-to-add -A'
-    system 'git archive --format=zip origin/master $(git diff --name-only origin/master --diff-filter=ACMR) --output "提出ファイル.zip"'
+    system'git add --intent-to-add -A'
+    system 'hash=$(git stash create) && git archive $hash --format=zip $(git diff --name-only origin/master $hash --diff-filter=ACMR) --output "提出ファイル.zip"'
   end
 
 end
