@@ -70,8 +70,8 @@ ORGSHELL
 
     diff = `git diff --name-only origin/master #{hash} --diff-filter=ACMR`.strip
 
-    filename = '提出ファイル.zip'
-    filename.encode!(Encoding::Windows_31J) if Gem.win_platform?
+    filename = 'submit_me.zip'
+    #filename.encode!(Encoding::Windows_31J) if Gem.win_platform? # こんなの上手く行くわけないので日本語ファイル名は辞めた
 
     if diff.length < 1
       run "rm #{filename}"
