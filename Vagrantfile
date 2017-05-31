@@ -5,6 +5,16 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+
+required_plugins = %w(vagrant-triggers)
+
+required_plugins.each do |plugin|
+  unless Vagrant.has_plugin? plugin
+    system "vagrant plugin install #{plugin}"
+    raise '必要なプラグインをインストールしました！もう一度コマンドを実行し、再開してください ;)'
+  end
+end
+
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
   # config.vm.box_check_update = false
@@ -25,6 +35,7 @@ Vagrant.configure("2") do |config|
 apt-get update -y
 apt-get install -y git curl
 apt-get install -y libv8-3.14.5
+apt-get install -y supervisor
 SHELL
 
   # 本当はrbenv (on anyenv) がいいけどコンパイルする時間も余剰CPUも無いのでrvmでbinaryを落とす
@@ -45,13 +56,15 @@ exec $SHELL -l << ASLOGINSHELL
 ASLOGINSHELL
 ORGSHELL
 
-  config.vm.provision 'supervisor', type: 'shell', privileged: true, inline: <<-ORGSHELL
-apt-get install supervisor -y
-ORGSHELL
-
   config.vm.provision '(re)start supervisord', type: 'shell', privileged: true, run: 'always', inline: <<-ORGSHELL
 \\cp -f /vagrant/jekyll-serve.supervisor.conf /etc/supervisor/conf.d/jekyll-serve.supervisor.conf
 service supervisor restart
 ORGSHELL
+
+  config.trigger.after :halt do
+    system 'git config --local --bool core.quotepath false'
+    system 'git add --intent-to-add -A'
+    system 'git archive --format=zip origin/master $(git diff --name-only origin/master --diff-filter=ACMR) --output "提出ファイル.zip"'
+  end
 
 end
