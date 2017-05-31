@@ -64,7 +64,18 @@ ORGSHELL
   config.trigger.after :halt do
     system 'git config --local --bool core.quotepath false'
     system 'git add --intent-to-add -A'
-    system 'stashed=$(git stash create) && if [ -z $stashed ]; then hash="HEAD"; else hash=$stashed; fi && diff=$(git diff --name-only origin/master $hash --diff-filter=ACMR) && if [ -z $diff ]; then rm "提出ファイル.zip"; else git archive $hash --format=zip $diff --output "提出ファイル.zip"; fi'
+
+    stashed = `git stash create`.strip
+    hash = stashed.length > 0 ? stashed : 'HEAD'
+
+    diff = `git diff --name-only origin/master #{hash} --diff-filter=ACMR`.strip
+
+    if diff.length < 1
+      run 'rm "提出ファイル.zip"'
+    else
+      run "git archive #{hash} --format=zip #{diff} --output '提出ファイル.zip'"
+    end
+
   end
 
 end
